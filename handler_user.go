@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Bayan2019/rss_blog/internal/auth"
 	"github.com/Bayan2019/rss_blog/internal/database"
 	"github.com/google/uuid"
 )
@@ -35,8 +36,21 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create user : %s", err))
 	}
 
+	respondWithJSON(w, 201, databaseUserToUser(user))
+}
+
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
+
+	apiKey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWithError(w, 403, fmt.Sprintf("Authentication error: %s", err))
+		return
+	}
+
+	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get user : %s", err))
+	}
+
 	respondWithJSON(w, 200, databaseUserToUser(user))
-	// w.Header().Add("Content-Type", "text/plain; charset=utf-8")
-	// w.WriteHeader(http.StatusOK)
-	// w.Write([]byte(http.StatusText(http.StatusOK)))
 }
