@@ -80,3 +80,8 @@ func databaseFeedFollowsToFeedFollows(dbFeedFollows []database.FeedFollow) []Fee
 
 	return feedFollows
 }
+
+type FeedFeedFollow struct {
+	Feed       Feed       `json:"feed"`
+	FeedFollow FeedFollow `json:"feedFollow"`
+}
