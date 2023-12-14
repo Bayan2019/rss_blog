@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Bayan2019/rss_blog/internal/database"
 	"github.com/go-chi/chi"
@@ -20,6 +21,13 @@ type apiConfig struct {
 }
 
 func main() {
+
+	// feed, err := urlToFeed("https://wagslane.dev/index.xml")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println(feed)
+
 	godotenv.Load(".env")
 
 	portString := os.Getenv("PORT")
@@ -37,14 +45,13 @@ func main() {
 		log.Fatal("Can't  connect to database")
 	}
 
-	queries := database.New(conn)
-	// if err != nil {
-	// 	log.Fatal("Can't create db connection", err)
-	// }
+	db := database.New(conn)
 
 	apiCfg := apiConfig{
-		DB: queries,
+		DB: db,
 	}
+
+	go startScraping(db, 10, time.Minute)
 
 	app_router := chi.NewRouter()
 
